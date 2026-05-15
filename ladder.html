@@ -1088,7 +1088,7 @@
                     <ul class="audit-list">
                         <li>Full Ladder pairs months six months apart and sizes capital from annual pair gap / assumed yield.</li>
                         <li>Yield is treated as a single flat annual input, not a term structure by maturity.</li>
-                        <li>Stage 2 purchase recommendations are disabled; Stage 2 is used for non-prescriptive scenario stress testing only.</li>
+                        <li>Stage 2 is limited to non-prescriptive scenario stress testing.</li>
                         <li>Any sizing math shown elsewhere should be treated as model diagnostics, not investment advice.</li>
                         <li>Scenario view shocks only yield (plus/minus bps) while holdings and target remain fixed.</li>
                     </ul>
@@ -1202,7 +1202,7 @@
         </div>
 
         <div id="stage2Workbench" class="panel">
-            <h2>Stage 2: Scenario Stress Test (No Recommendations)</h2>
+            <h2>Stage 2: Scenario Stress Test</h2>
             <div class="stage2-controls">
                 <div class="field">
                     <label>Scenario Shock (bps):</label>
@@ -1214,7 +1214,7 @@
                 </div>
             </div>
 
-            <div id="stage2NoticeOutput" class="stage2-note">Automated purchase recommendations are disabled. This section provides scenario stress testing only.</div>
+            <div id="stage2NoticeOutput" class="stage2-note">This section provides non-prescriptive scenario stress testing only.</div>
             <div id="scenarioOutput" class="stage2-note">Scenario comparison appears here after calculation.</div>
         </div>
 
@@ -2017,7 +2017,7 @@
             const scenarioOutput = document.getElementById("scenarioOutput");
 
             if (target <= 0) {
-                stage2NoticeOutput.textContent = "Automated purchase recommendations are disabled. Enter a valid target to run scenario stress tests.";
+                stage2NoticeOutput.textContent = "This section provides non-prescriptive scenario stress testing only. Enter a valid target to continue.";
                 scenarioOutput.textContent = "Scenario comparison needs a valid target monthly income.";
                 return;
             }
@@ -2029,7 +2029,7 @@
                 return;
             }
             const scenario = buildScenarioComparison(monthly, target, baseYield, shockBps);
-            stage2NoticeOutput.textContent = "Automated purchase recommendations are disabled. Use Stage 1 and Stage 4 for planning and review.";
+            stage2NoticeOutput.textContent = "This section provides non-prescriptive scenario stress testing only. Use Stage 1 and Stage 4 for planning and review.";
             scenarioOutput.innerHTML = renderScenarioHtml(scenario, shockBps);
 
             saveData();

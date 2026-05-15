@@ -30,7 +30,7 @@ A single-file, client-side bond ladder design and projection tool for modeling c
 
 - **Income model:** Monthly coupon = face × annual rate ÷ number of coupon months per year
 - **Zero-coupon gain:** Realized at maturity (face − purchase cost)
-- **Stage 2 scope:** Scenario stress testing only; automated purchase recommendations are intentionally disabled
+- **Stage 2 scope:** Non-prescriptive scenario stress testing only (no personalized investment recommendations)
 - **Audit:** Consistency checks on import; does not validate against actual brokerage data
 - **Simulator:** Simple monthly accrual of reinvestment income; annual cash deployment blocks
 
