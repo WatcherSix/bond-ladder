@@ -1088,8 +1088,8 @@
                     <ul class="audit-list">
                         <li>Full Ladder pairs months six months apart and sizes capital from annual pair gap / assumed yield.</li>
                         <li>Yield is treated as a single flat annual input, not a term structure by maturity.</li>
-                        <li>Stage 2 recommendations size buckets based on selected frequency (monthly, annual, semiannual, or custom months).</li>
-                        <li>Budget allocation is greedy by largest annual pair gap, not optimized with transaction constraints.</li>
+                        <li>Stage 2 purchase recommendations are disabled; Stage 2 is used for non-prescriptive scenario stress testing only.</li>
+                        <li>Any sizing math shown elsewhere should be treated as model diagnostics, not investment advice.</li>
                         <li>Scenario view shocks only yield (plus/minus bps) while holdings and target remain fixed.</li>
                     </ul>
                 </div>
@@ -1202,7 +1202,7 @@
         </div>
 
         <div id="stage2Workbench" class="panel">
-            <h2>Stage 2: Recommendations + Scenarios</h2>
+            <h2>Stage 2: Scenario Stress Test (No Recommendations)</h2>
             <div class="stage2-controls">
                 <div class="field">
                     <label>Planned Coupon Rate (%):</label>
@@ -1231,11 +1231,11 @@
                 </div>
                 <div class="field">
                     <label>&nbsp;</label>
-                    <button class="button-primary" onclick="updateStage2Planner()">Refresh Stage 2 Plan</button>
+                    <button class="button-primary" onclick="updateStage2Planner()">Refresh Stage 2 Scenario</button>
                 </div>
             </div>
 
-            <div id="recommendationOutput" class="stage2-note">Set your assumptions and refresh to generate recommendations.</div>
+            <div id="recommendationOutput" class="stage2-note">Automated purchase recommendations are disabled. This section only provides scenario stress testing.</div>
             <div id="scenarioOutput" class="stage2-note">Scenario comparison appears here after calculation.</div>
         </div>
 
@@ -2054,49 +2054,19 @@
             const scenarioOutput = document.getElementById("scenarioOutput");
 
             if (target <= 0) {
-                recommendationOutput.textContent = "Set a target monthly income greater than 0 to generate recommendations.";
+                recommendationOutput.textContent = "Automated purchase recommendations are disabled. Enter a valid target to run scenario stress tests.";
                 scenarioOutput.textContent = "Scenario comparison needs a valid target monthly income.";
                 return;
             }
-
-            const couponRatePct = parseFloat(document.getElementById("recommendationCouponRate").value);
-            const recommendationFrequency = document.getElementById("recommendationFrequency").value;
-            const recommendationCustomMonths = document.getElementById("recommendationCustomMonths").value || "";
-            const budget = Math.max(0, parseFloat(document.getElementById("recommendationBudget").value) || 0);
             const baseYield = parseFloat(document.getElementById("fullLadderYield").value);
             const shockBps = Math.max(0, parseFloat(document.getElementById("scenarioShockBps").value) || 0);
-
-            if (!Number.isFinite(couponRatePct) || couponRatePct <= 0 || couponRatePct > 100) {
-                recommendationOutput.textContent = "Enter a valid planned coupon rate (0-100).";
-                return;
-            }
 
             if (!Number.isFinite(baseYield) || baseYield <= 0) {
                 scenarioOutput.textContent = "Enter a valid base yield in Full Ladder settings.";
                 return;
             }
-
-            if (!["monthly", "semiannual", "annual", "custom"].includes(recommendationFrequency)) {
-                recommendationOutput.textContent = "Select a valid recommendation frequency.";
-                return;
-            }
-
-            const recommendation = buildRecommendationPlan(
-                monthly,
-                target,
-                couponRatePct,
-                budget,
-                recommendationFrequency,
-                recommendationCustomMonths
-            );
             const scenario = buildScenarioComparison(monthly, target, baseYield, shockBps);
-
-            recommendationOutput.innerHTML = renderRecommendationHtml(
-                recommendation,
-                couponRatePct,
-                budget,
-                recommendationFrequency
-            );
+            recommendationOutput.textContent = "Automated purchase recommendations are disabled. Use Stage 1 and Stage 4 for planning and review.";
             scenarioOutput.innerHTML = renderScenarioHtml(scenario, shockBps);
 
             saveData();

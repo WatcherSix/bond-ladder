@@ -5,7 +5,7 @@ A single-file, client-side bond ladder design and projection tool for modeling c
 ## Features
 
 - **Stage 1: Monthly Income Table** — View coupon and maturity payments month-by-month, identify gaps, drill down by source
-- **Stage 2: Frequency-Aware Recommendations** — Generate bond purchase recommendations with flexible coupon schedules (monthly, annual, semiannual, custom)
+- **Stage 2: Scenario Stress Test (Non-Prescriptive)** — Compare capital requirement sensitivity under yield shock scenarios
 - **Stage 3: Data Quality Audit** — Reconcile modeled income against imported bonds, validate structure, review change history
 - **Stage 4: Multi-Year Reinvestment Simulator** — Project annual coverage, reinvestment income, and carry-cash deployment over 10+ years
 
@@ -22,7 +22,7 @@ A single-file, client-side bond ladder design and projection tool for modeling c
 1. **Open** `ladder.html` in any modern browser
 2. **Load or import bonds** — CSV (quantity, coupon %, maturity) or JSON snapshot
 3. **Review monthly income** — Stage 1 shows gaps and coverage %
-4. **Generate recommendations** — Stage 2 sizes bond purchases by frequency preference
+4. **Run stress tests** — Stage 2 compares conservative/base/aggressive capital scenarios
 5. **Audit data quality** — Stage 3 validates totals and flags issues
 6. **Simulate reinvestment** — Stage 4 projects multi-year growth with custom yields and deployment %
 
@@ -30,7 +30,7 @@ A single-file, client-side bond ladder design and projection tool for modeling c
 
 - **Income model:** Monthly coupon = face × annual rate ÷ number of coupon months per year
 - **Zero-coupon gain:** Realized at maturity (face − purchase cost)
-- **Recommendations:** Bucket-based sizing using largest monthly deficit as anchor, scaled by coupon frequency
+- **Stage 2 scope:** Scenario stress testing only; automated purchase recommendations are intentionally disabled
 - **Audit:** Consistency checks on import; does not validate against actual brokerage data
 - **Simulator:** Simple monthly accrual of reinvestment income; annual cash deployment blocks
 
@@ -45,8 +45,12 @@ README.md            — This file
 
 - Single-file architecture minimizes deployment friction; all logic is self-contained
 - Data persists to localStorage automatically; no server-side storage needed
-- Audit log tracks all user actions (imports, changes, recommendations)
+- Audit log tracks all user actions (imports, edits, resets, calculations)
 - Coupon schedules are flexible: bonds store `couponFrequency` and `months` array for granular control
+
+## Financial Use Disclaimer
+
+This tool is for educational and planning purposes only and does not constitute investment, legal, or tax advice. Outputs are model-based estimates using user-provided assumptions and may not reflect actual market results. Consult a licensed financial professional before making investment decisions.
 
 ## Limitations & Future Work
 
