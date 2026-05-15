@@ -5,9 +5,8 @@ A single-file, client-side bond ladder design and projection tool for modeling c
 ## Features
 
 - **Stage 1: Monthly Income Table** — View coupon and maturity payments month-by-month, identify gaps, drill down by source
-- **Stage 2: Scenario Stress Test (Non-Prescriptive)** — Compare capital requirement sensitivity under yield shock scenarios
-- **Stage 3: Data Quality Audit** — Reconcile modeled income against imported bonds, validate structure, review change history
-- **Stage 4: Multi-Year Reinvestment Simulator** — Project annual coverage, reinvestment income, and carry-cash deployment over 10+ years
+- **Stage 2: Data Quality Audit** — Reconcile modeled income against imported bonds, validate structure, review change history
+- **Stage 3: Multi-Year Reinvestment Simulator** — Project annual coverage, reinvestment income, and carry-cash deployment over 10+ years
 
 ## Tech Stack
 
@@ -22,15 +21,13 @@ A single-file, client-side bond ladder design and projection tool for modeling c
 1. **Open** `ladder.html` in any modern browser
 2. **Load or import bonds** — CSV (quantity, coupon %, maturity) or JSON snapshot
 3. **Review monthly income** — Stage 1 shows gaps and coverage %
-4. **Run stress tests** — Stage 2 compares conservative/base/aggressive capital scenarios
-5. **Audit data quality** — Stage 3 validates totals and flags issues
-6. **Simulate reinvestment** — Stage 4 projects multi-year growth with custom yields and deployment %
+4. **Audit data quality** — Stage 2 validates totals and flags issues
+5. **Simulate reinvestment** — Stage 3 projects multi-year growth with custom yields and deployment %
 
 ## Key Assumptions
 
 - **Income model:** Monthly coupon = face × annual rate ÷ number of coupon months per year
 - **Zero-coupon gain:** Realized at maturity (face − purchase cost)
-- **Stage 2 scope:** Non-prescriptive scenario stress testing only (no personalized investment recommendations)
 - **Audit:** Consistency checks on import; does not validate against actual brokerage data
 - **Simulator:** Simple monthly accrual of reinvestment income; annual cash deployment blocks
 

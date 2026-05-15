@@ -480,10 +480,6 @@
             font-size: 0.87rem;
         }
 
-        #stage2Workbench {
-            margin-top: 20px;
-        }
-
         .stage2-controls {
             display: grid;
             grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -1084,13 +1080,11 @@
                     </ul>
                 </div>
                 <div class="audit-box">
-                    <h3>Full Ladder and Stage 2 Math</h3>
+                    <h3>Full Ladder Math</h3>
                     <ul class="audit-list">
                         <li>Full Ladder pairs months six months apart and sizes capital from annual pair gap / assumed yield.</li>
                         <li>Yield is treated as a single flat annual input, not a term structure by maturity.</li>
-                        <li>Stage 2 is limited to non-prescriptive scenario stress testing.</li>
-                        <li>Any sizing math shown elsewhere should be treated as model diagnostics, not investment advice.</li>
-                        <li>Scenario view shocks only yield (plus/minus bps) while holdings and target remain fixed.</li>
+                        <li>Capital requirement outputs are model diagnostics for planning, not investment advice.</li>
                     </ul>
                 </div>
             </div>
@@ -1200,24 +1194,6 @@
             </div>
 
         </div>
-
-        <div id="stage2Workbench" class="panel">
-            <h2>Stage 2: Scenario Stress Test</h2>
-            <div class="stage2-controls">
-                <div class="field">
-                    <label>Scenario Shock (bps):</label>
-                    <input id="scenarioShockBps" type="number" step="25" value="100">
-                </div>
-                <div class="field">
-                    <label>&nbsp;</label>
-                    <button class="button-primary" onclick="updateStage2Planner()">Refresh Stage 2 Scenario</button>
-                </div>
-            </div>
-
-            <div id="stage2NoticeOutput" class="stage2-note">This section provides non-prescriptive scenario stress testing only.</div>
-            <div id="scenarioOutput" class="stage2-note">Scenario comparison appears here after calculation.</div>
-        </div>
-
         <div id="stage3Audit" class="panel">
             <h2>Stage 3: Auditability + Reconciliation</h2>
             <div id="reconciliationOutput" class="stage2-note">Reconciliation summary will appear here.</div>
@@ -1318,7 +1294,6 @@
             localStorage.setItem("sortMode", document.getElementById("sortMode").value);
             localStorage.setItem("yearsFilter", document.getElementById("yearsFilter").value);
             localStorage.setItem("fullLadderYield", document.getElementById("fullLadderYield").value);
-            localStorage.setItem("scenarioShockBps", document.getElementById("scenarioShockBps").value);
             localStorage.setItem("simulationYears", document.getElementById("simulationYears").value);
             localStorage.setItem("simulationReinvestYield", document.getElementById("simulationReinvestYield").value);
             localStorage.setItem("simulationDeployPct", document.getElementById("simulationDeployPct").value);
@@ -1334,7 +1309,6 @@
             const savedSort = localStorage.getItem("sortMode");
             const savedYears = localStorage.getItem("yearsFilter");
             const savedYield = localStorage.getItem("fullLadderYield");
-            const savedShockBps = localStorage.getItem("scenarioShockBps");
             const savedSimYears = localStorage.getItem("simulationYears");
             const savedSimYield = localStorage.getItem("simulationReinvestYield");
             const savedSimDeploy = localStorage.getItem("simulationDeployPct");
@@ -1355,7 +1329,6 @@
             if (savedSort) document.getElementById("sortMode").value = savedSort;
             if (savedYears) document.getElementById("yearsFilter").value = savedYears;
             if (savedYield) document.getElementById("fullLadderYield").value = savedYield;
-            if (savedShockBps) document.getElementById("scenarioShockBps").value = savedShockBps;
             if (savedSimYears) document.getElementById("simulationYears").value = savedSimYears;
             if (savedSimYield) document.getElementById("simulationReinvestYield").value = savedSimYield;
             if (savedSimDeploy) document.getElementById("simulationDeployPct").value = savedSimDeploy;
@@ -1416,7 +1389,6 @@
             localStorage.removeItem("recommendationFrequency");
             localStorage.removeItem("recommendationCustomMonths");
             localStorage.removeItem("recommendationBudget");
-            localStorage.removeItem("scenarioShockBps");
             localStorage.removeItem("simulationYears");
             localStorage.removeItem("simulationReinvestYield");
             localStorage.removeItem("simulationDeployPct");
@@ -1428,7 +1400,6 @@
             document.getElementById("sortMode").value = "none";
             document.getElementById("yearsFilter").value = "12";
             document.getElementById("fullLadderYield").value = "5.00";
-            document.getElementById("scenarioShockBps").value = "100";
             document.getElementById("simulationYears").value = "5";
             document.getElementById("simulationReinvestYield").value = "5.00";
             document.getElementById("simulationDeployPct").value = "100";
@@ -1564,7 +1535,6 @@
             updateIncomeTable();
             updateLadderHealth();
             updateCoverageSummary();
-            updateStage2Planner();
             renderAuditPanels();
             updateStage4Simulation();
             if (currentView === "timeline") updateTimeline();
@@ -2010,31 +1980,6 @@
                         saveData();
         }
 
-        function updateStage2Planner() {
-            const monthly = window._monthlyCache || Array(12).fill(0);
-            const target = parseFloat(document.getElementById("target").value) || 0;
-            const stage2NoticeOutput = document.getElementById("stage2NoticeOutput");
-            const scenarioOutput = document.getElementById("scenarioOutput");
-
-            if (target <= 0) {
-                stage2NoticeOutput.textContent = "This section provides non-prescriptive scenario stress testing only. Enter a valid target to continue.";
-                scenarioOutput.textContent = "Scenario comparison needs a valid target monthly income.";
-                return;
-            }
-            const baseYield = parseFloat(document.getElementById("fullLadderYield").value);
-            const shockBps = Math.max(0, parseFloat(document.getElementById("scenarioShockBps").value) || 0);
-
-            if (!Number.isFinite(baseYield) || baseYield <= 0) {
-                scenarioOutput.textContent = "Enter a valid base yield in Full Ladder settings.";
-                return;
-            }
-            const scenario = buildScenarioComparison(monthly, target, baseYield, shockBps);
-            stage2NoticeOutput.textContent = "This section provides non-prescriptive scenario stress testing only. Use Stage 1 and Stage 4 for planning and review.";
-            scenarioOutput.innerHTML = renderScenarioHtml(scenario, shockBps);
-
-            saveData();
-        }
-
         function updateStage4AndSave() {
             updateStage4Simulation();
             saveData();
@@ -2477,61 +2422,6 @@
                 hash |= 0;
             }
             return `FP-${Math.abs(hash).toString(16).toUpperCase()}`;
-        }
-
-        function buildScenarioComparison(monthly, target, baseYield, shockBps) {
-            const step = shockBps / 100;
-            const conservativeYield = Math.max(0.1, baseYield - step);
-            const aggressiveYield = baseYield + step;
-
-            const conservative = calculateCapitalAtYield(monthly, target, conservativeYield);
-            const base = calculateCapitalAtYield(monthly, target, baseYield);
-            const aggressive = calculateCapitalAtYield(monthly, target, aggressiveYield);
-
-            return {
-                conservativeYield,
-                baseYield,
-                aggressiveYield,
-                conservative,
-                base,
-                aggressive
-            };
-        }
-
-
-        function getMonthNames() {
-            return ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        }
-
-        function renderScenarioHtml(scenario, shockBps) {
-            const baseCapital = scenario.base.totalCapital;
-
-            function deltaText(value) {
-                const delta = value - baseCapital;
-                const sign = delta >= 0 ? "+" : "";
-                return `${sign}${formatCurrency(delta)} vs base`;
-            }
-
-            return `
-                <div class="scenario-grid">
-                    <div class="scenario-card">
-                        <h3>Conservative (${scenario.conservativeYield.toFixed(2)}%)</h3>
-                        <div class="scenario-capital">${formatCurrency(scenario.conservative.totalCapital)}</div>
-                        <div class="scenario-delta">${deltaText(scenario.conservative.totalCapital)}</div>
-                    </div>
-                    <div class="scenario-card">
-                        <h3>Base (${scenario.baseYield.toFixed(2)}%)</h3>
-                        <div class="scenario-capital">${formatCurrency(scenario.base.totalCapital)}</div>
-                        <div class="scenario-delta">Reference case.</div>
-                    </div>
-                    <div class="scenario-card">
-                        <h3>Aggressive (${scenario.aggressiveYield.toFixed(2)}%)</h3>
-                        <div class="scenario-capital">${formatCurrency(scenario.aggressive.totalCapital)}</div>
-                        <div class="scenario-delta">${deltaText(scenario.aggressive.totalCapital)}</div>
-                    </div>
-                </div>
-                <div class="stage2-note">Scenario shock is ±${shockBps.toFixed(0)} bps around base yield and recalculates total required capital against current monthly deficits.</div>
-            `;
         }
 
         function calculateCapitalAtYield(monthly, target, yieldPct) {
@@ -3146,7 +3036,6 @@
                 sortMode: document.getElementById("sortMode").value,
                 yearsFilter: document.getElementById("yearsFilter").value,
                 fullLadderYield: parseFloat(document.getElementById("fullLadderYield").value) || 5,
-                scenarioShockBps: parseFloat(document.getElementById("scenarioShockBps").value) || 100,
                 simulationYears: parseInt(document.getElementById("simulationYears").value, 10) || 5,
                 simulationReinvestYield: parseFloat(document.getElementById("simulationReinvestYield").value) || 5,
                 simulationDeployPct: parseFloat(document.getElementById("simulationDeployPct").value) || 100,
@@ -3199,10 +3088,6 @@
                     if (payload.fullLadderYield !== undefined) {
                         const y = parseFloat(payload.fullLadderYield);
                         if (Number.isFinite(y) && y > 0) document.getElementById("fullLadderYield").value = y;
-                    }
-                    if (payload.scenarioShockBps !== undefined) {
-                        const s = parseFloat(payload.scenarioShockBps);
-                        if (Number.isFinite(s) && s >= 0) document.getElementById("scenarioShockBps").value = s;
                     }
                     if (payload.simulationYears !== undefined) {
                         const y = parseInt(payload.simulationYears, 10);
