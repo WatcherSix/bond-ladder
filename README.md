@@ -55,7 +55,7 @@ All financial logic, architecture, and validation are original work.
 
 ## Financial Use Disclaimer
 
-This tool is for educational and planning purposes only and does not constitute investment, legal, or tax advice. Outputs are model-based estimates using user-provided assumptions and may not reflect actual market results. Consult a licensed financial professional before making investment decisions.
+This tool is for educational and planning purposes only and does not constitute investment, legal, or tax advice. It does not provide personalized recommendations to buy, sell, hold, or allocate any security. Outputs are model-based estimates using user-provided assumptions and may not reflect actual market results. Consult a licensed financial professional before making investment decisions.
 
 ## Limitations & Future Work
 

@@ -1069,7 +1069,7 @@
     <div id="mainPanel">
 
         <h1>Bond Ladder Dashboard</h1>
-        <p class="page-subtitle">Design your coupon and maturity flow so each month has the income coverage you need.</p>
+        <p class="page-subtitle">Model coupon and maturity cashflows so each month can be compared to a user-defined income target.</p>
 
         <div id="assumptionsPanel" class="panel">
             <h2>Model Assumptions and Limits</h2>
@@ -1205,27 +1205,6 @@
             <h2>Stage 2: Scenario Stress Test (No Recommendations)</h2>
             <div class="stage2-controls">
                 <div class="field">
-                    <label>Planned Coupon Rate (%):</label>
-                    <input id="recommendationCouponRate" type="number" step="0.01" value="5.00">
-                </div>
-                <div class="field">
-                    <label>Recommendation Frequency:</label>
-                    <select id="recommendationFrequency">
-                        <option value="semiannual">Semiannual</option>
-                        <option value="monthly">Monthly</option>
-                        <option value="annual">Annual</option>
-                        <option value="custom">Custom</option>
-                    </select>
-                </div>
-                <div class="field">
-                    <label>Custom Months (if custom):</label>
-                    <input id="recommendationCustomMonths" type="text" placeholder="e.g. 3,6,9,12">
-                </div>
-                <div class="field">
-                    <label>Deployment Budget ($, optional):</label>
-                    <input id="recommendationBudget" type="number" step="100" value="0">
-                </div>
-                <div class="field">
                     <label>Scenario Shock (bps):</label>
                     <input id="scenarioShockBps" type="number" step="25" value="100">
                 </div>
@@ -1235,7 +1214,7 @@
                 </div>
             </div>
 
-            <div id="recommendationOutput" class="stage2-note">Automated purchase recommendations are disabled. This section only provides scenario stress testing.</div>
+            <div id="stage2NoticeOutput" class="stage2-note">Automated purchase recommendations are disabled. This section provides scenario stress testing only.</div>
             <div id="scenarioOutput" class="stage2-note">Scenario comparison appears here after calculation.</div>
         </div>
 
@@ -1339,10 +1318,6 @@
             localStorage.setItem("sortMode", document.getElementById("sortMode").value);
             localStorage.setItem("yearsFilter", document.getElementById("yearsFilter").value);
             localStorage.setItem("fullLadderYield", document.getElementById("fullLadderYield").value);
-            localStorage.setItem("recommendationCouponRate", document.getElementById("recommendationCouponRate").value);
-            localStorage.setItem("recommendationFrequency", document.getElementById("recommendationFrequency").value);
-            localStorage.setItem("recommendationCustomMonths", document.getElementById("recommendationCustomMonths").value);
-            localStorage.setItem("recommendationBudget", document.getElementById("recommendationBudget").value);
             localStorage.setItem("scenarioShockBps", document.getElementById("scenarioShockBps").value);
             localStorage.setItem("simulationYears", document.getElementById("simulationYears").value);
             localStorage.setItem("simulationReinvestYield", document.getElementById("simulationReinvestYield").value);
@@ -1359,10 +1334,6 @@
             const savedSort = localStorage.getItem("sortMode");
             const savedYears = localStorage.getItem("yearsFilter");
             const savedYield = localStorage.getItem("fullLadderYield");
-            const savedRecCoupon = localStorage.getItem("recommendationCouponRate");
-            const savedRecFrequency = localStorage.getItem("recommendationFrequency");
-            const savedRecCustomMonths = localStorage.getItem("recommendationCustomMonths");
-            const savedRecBudget = localStorage.getItem("recommendationBudget");
             const savedShockBps = localStorage.getItem("scenarioShockBps");
             const savedSimYears = localStorage.getItem("simulationYears");
             const savedSimYield = localStorage.getItem("simulationReinvestYield");
@@ -1384,10 +1355,6 @@
             if (savedSort) document.getElementById("sortMode").value = savedSort;
             if (savedYears) document.getElementById("yearsFilter").value = savedYears;
             if (savedYield) document.getElementById("fullLadderYield").value = savedYield;
-            if (savedRecCoupon) document.getElementById("recommendationCouponRate").value = savedRecCoupon;
-            if (savedRecFrequency) document.getElementById("recommendationFrequency").value = savedRecFrequency;
-            if (savedRecCustomMonths) document.getElementById("recommendationCustomMonths").value = savedRecCustomMonths;
-            if (savedRecBudget) document.getElementById("recommendationBudget").value = savedRecBudget;
             if (savedShockBps) document.getElementById("scenarioShockBps").value = savedShockBps;
             if (savedSimYears) document.getElementById("simulationYears").value = savedSimYears;
             if (savedSimYield) document.getElementById("simulationReinvestYield").value = savedSimYield;
@@ -1461,10 +1428,6 @@
             document.getElementById("sortMode").value = "none";
             document.getElementById("yearsFilter").value = "12";
             document.getElementById("fullLadderYield").value = "5.00";
-            document.getElementById("recommendationCouponRate").value = "5.00";
-            document.getElementById("recommendationFrequency").value = "semiannual";
-            document.getElementById("recommendationCustomMonths").value = "";
-            document.getElementById("recommendationBudget").value = "0";
             document.getElementById("scenarioShockBps").value = "100";
             document.getElementById("simulationYears").value = "5";
             document.getElementById("simulationReinvestYield").value = "5.00";
@@ -2050,11 +2013,11 @@
         function updateStage2Planner() {
             const monthly = window._monthlyCache || Array(12).fill(0);
             const target = parseFloat(document.getElementById("target").value) || 0;
-            const recommendationOutput = document.getElementById("recommendationOutput");
+            const stage2NoticeOutput = document.getElementById("stage2NoticeOutput");
             const scenarioOutput = document.getElementById("scenarioOutput");
 
             if (target <= 0) {
-                recommendationOutput.textContent = "Automated purchase recommendations are disabled. Enter a valid target to run scenario stress tests.";
+                stage2NoticeOutput.textContent = "Automated purchase recommendations are disabled. Enter a valid target to run scenario stress tests.";
                 scenarioOutput.textContent = "Scenario comparison needs a valid target monthly income.";
                 return;
             }
@@ -2066,7 +2029,7 @@
                 return;
             }
             const scenario = buildScenarioComparison(monthly, target, baseYield, shockBps);
-            recommendationOutput.textContent = "Automated purchase recommendations are disabled. Use Stage 1 and Stage 4 for planning and review.";
+            stage2NoticeOutput.textContent = "Automated purchase recommendations are disabled. Use Stage 1 and Stage 4 for planning and review.";
             scenarioOutput.innerHTML = renderScenarioHtml(scenario, shockBps);
 
             saveData();
@@ -2516,90 +2479,6 @@
             return `FP-${Math.abs(hash).toString(16).toUpperCase()}`;
         }
 
-        function buildRecommendationPlan(monthly, target, couponRatePct, budget, recommendationFrequency, recommendationCustomMonths) {
-            const rate = couponRatePct / 100;
-            const deficits = monthly.map(v => Math.max(0, target - v));
-            const buckets = getRecommendationBuckets(recommendationFrequency, recommendationCustomMonths);
-
-            if (!buckets.length) {
-                return {
-                    rows: [],
-                    totalFaceNeeded: 0,
-                    totalAllocated: 0,
-                    fundedAfterBudget: monthly.filter(v => v >= target).length,
-                    projectedAnnualGap: deficits.reduce((a, b) => a + b, 0),
-                    remainingBudget: budget,
-                    projectedMonthly: monthly.slice(),
-                    error: recommendationFrequency === "custom"
-                        ? "Custom frequency needs at least one valid month (1-12)."
-                        : "No recommendation buckets available for this frequency.",
-                    bucketLabel: formatRecommendationFrequencyLabel(recommendationFrequency),
-                    bucketCount: 0
-                };
-            }
-
-            const rows = buckets.map((bucket, idx) => {
-                const monthIndices = bucket.months;
-                const monthDeficits = monthIndices.map(m => deficits[m]);
-                const maxDef = monthDeficits.length ? Math.max(...monthDeficits) : 0;
-                const periodsPerYear = Math.max(1, monthIndices.length);
-                const faceNeeded = maxDef > 0 ? (periodsPerYear * maxDef) / rate : 0;
-                const annualCoupon = faceNeeded * rate;
-                const annualGap = monthDeficits.reduce((a, b) => a + b, 0);
-                const monthGapSummary = monthIndices
-                    .map(m => `${getMonthNames()[m]} ${formatCurrency(deficits[m])}`)
-                    .join(" | ");
-
-                return {
-                    pairIndex: idx + 1,
-                    monthLabel: bucket.label,
-                    monthIndices,
-                    periodsPerYear,
-                    monthGapSummary,
-                    annualGap,
-                    faceNeeded,
-                    annualCoupon,
-                    allocatedFace: 0
-                };
-            }).filter(r => r.annualGap > 0)
-                .sort((a, b) => b.annualGap - a.annualGap);
-
-            const projectedMonthly = monthly.slice();
-            let remainingBudget = budget;
-
-            rows.forEach(row => {
-                if (remainingBudget <= 0 || row.faceNeeded <= 0) return;
-                const allocation = Math.min(row.faceNeeded, remainingBudget);
-                row.allocatedFace = allocation;
-                remainingBudget -= allocation;
-
-                const paymentPerMonth = allocation * rate / row.periodsPerYear;
-                row.monthIndices.forEach(m => {
-                    projectedMonthly[m] += paymentPerMonth;
-                });
-            });
-
-            const totalFaceNeeded = rows.reduce((acc, r) => acc + r.faceNeeded, 0);
-            const totalAllocated = rows.reduce((acc, r) => acc + r.allocatedFace, 0);
-            const fundedAfterBudget = projectedMonthly.filter(v => v >= target).length;
-            const projectedAnnualGap = projectedMonthly
-                .map(v => Math.max(0, target - v))
-                .reduce((a, b) => a + b, 0);
-
-            return {
-                rows,
-                totalFaceNeeded,
-                totalAllocated,
-                fundedAfterBudget,
-                projectedAnnualGap,
-                remainingBudget,
-                projectedMonthly,
-                bucketLabel: formatRecommendationFrequencyLabel(recommendationFrequency),
-                bucketCount: buckets.length,
-                error: ""
-            };
-        }
-
         function buildScenarioComparison(monthly, target, baseYield, shockBps) {
             const step = shockBps / 100;
             const conservativeYield = Math.max(0.1, baseYield - step);
@@ -2619,143 +2498,6 @@
             };
         }
 
-        function renderRecommendationHtml(plan, couponRatePct, budget, recommendationFrequency) {
-            if (plan.error) {
-                return plan.error;
-            }
-
-            if (!plan.rows.length) {
-                return `All ${formatRecommendationFrequencyLabel(recommendationFrequency)} buckets are currently at or above target. No recommendation needed.`;
-            }
-
-            const rowHtml = plan.rows.map(r => {
-                let action = "Unfunded";
-                if (r.allocatedFace >= r.faceNeeded && r.faceNeeded > 0) action = "Fully funded";
-                else if (r.allocatedFace > 0) action = "Partially funded";
-
-                return `
-                    <tr>
-                        <td>${r.pairIndex}</td>
-                        <td>${r.monthLabel}</td>
-                        <td>${r.monthGapSummary}</td>
-                        <td>${formatCurrency(r.faceNeeded)}</td>
-                        <td>${formatCurrency(r.annualCoupon)}</td>
-                        <td>${formatCurrency(r.allocatedFace)}</td>
-                        <td>${action}</td>
-                    </tr>
-                `;
-            }).join("");
-
-            return `
-                <div class="stage2-cards">
-                    <div class="stage2-card">
-                        <div class="label">Planned Coupon Rate</div>
-                        <div class="value">${couponRatePct.toFixed(2)}%</div>
-                        <div class="sub">${plan.bucketLabel} targeting (${plan.bucketCount} buckets).</div>
-                    </div>
-                    <div class="stage2-card">
-                        <div class="label">Face Needed (Full Plan)</div>
-                        <div class="value">${formatCurrency(plan.totalFaceNeeded)}</div>
-                        <div class="sub">To fully close all pair gaps.</div>
-                    </div>
-                    <div class="stage2-card">
-                        <div class="label">Budget Deployment</div>
-                        <div class="value">${formatCurrency(plan.totalAllocated)}</div>
-                        <div class="sub">Budget input ${formatCurrency(budget)} | Remaining ${formatCurrency(plan.remainingBudget)}</div>
-                    </div>
-                </div>
-                <div class="stage2-cards">
-                    <div class="stage2-card">
-                        <div class="label">Funded Months After Budget</div>
-                        <div class="value">${plan.fundedAfterBudget} / 12</div>
-                        <div class="sub">Projected post-deployment coverage.</div>
-                    </div>
-                    <div class="stage2-card">
-                        <div class="label">Projected Annual Gap</div>
-                        <div class="value">${formatCurrency(plan.projectedAnnualGap)}</div>
-                        <div class="sub">Remaining after budget allocation.</div>
-                    </div>
-                    <div class="stage2-card">
-                        <div class="label">Buckets Requiring Action</div>
-                        <div class="value">${plan.rows.length}</div>
-                        <div class="sub">Sorted by largest annual gap.</div>
-                    </div>
-                </div>
-                <div class="stage2-table-wrap">
-                    <table>
-                        <tr>
-                            <th>Priority</th>
-                            <th>Bucket</th>
-                            <th>Month Gaps</th>
-                            <th>Suggested Face</th>
-                            <th>Annual Coupon</th>
-                            <th>Allocated Face</th>
-                            <th>Status</th>
-                        </tr>
-                        ${rowHtml}
-                    </table>
-                </div>
-                <div class="stage2-note">Recommendation logic sizes each ${plan.bucketLabel} bucket from the largest month deficit within that bucket, so each covered month in that bucket receives at least the required payment level.</div>
-            `;
-        }
-
-        function getRecommendationBuckets(recommendationFrequency, customMonthsText) {
-            const monthNames = getMonthNames();
-
-            if (recommendationFrequency === "monthly") {
-                return [{
-                    label: "All Months",
-                    months: Array.from({ length: 12 }, (_, i) => i)
-                }];
-            }
-
-            if (recommendationFrequency === "annual") {
-                return monthNames.map((name, idx) => ({
-                    label: name,
-                    months: [idx]
-                }));
-            }
-
-            if (recommendationFrequency === "semiannual") {
-                return getSemiannualPairs().map(pair => ({
-                    label: `${monthNames[pair.m1]} / ${monthNames[pair.m2]}`,
-                    months: [pair.m1, pair.m2]
-                }));
-            }
-
-            if (recommendationFrequency === "custom") {
-                const months = parseMonthListInput(customMonthsText)
-                    .map(m => m - 1)
-                    .filter(m => m >= 0 && m <= 11);
-
-                if (!months.length) return [];
-
-                return [{
-                    label: months.map(m => monthNames[m]).join(" / "),
-                    months
-                }];
-            }
-
-            return [];
-        }
-
-        function formatRecommendationFrequencyLabel(freq) {
-            if (freq === "monthly") return "monthly";
-            if (freq === "annual") return "annual";
-            if (freq === "semiannual") return "semiannual";
-            if (freq === "custom") return "custom";
-            return "selected";
-        }
-
-        function parseMonthListInput(text) {
-            if (!text || typeof text !== "string") return [];
-            return Array.from(new Set(
-                text
-                    .split(",")
-                    .map(part => parseInt(part.trim(), 10))
-                    .filter(n => Number.isInteger(n) && n >= 1 && n <= 12)
-            )).sort((a, b) => a - b);
-        }
 
         function getMonthNames() {
             return ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -3404,10 +3146,6 @@
                 sortMode: document.getElementById("sortMode").value,
                 yearsFilter: document.getElementById("yearsFilter").value,
                 fullLadderYield: parseFloat(document.getElementById("fullLadderYield").value) || 5,
-                recommendationCouponRate: parseFloat(document.getElementById("recommendationCouponRate").value) || 5,
-                recommendationFrequency: document.getElementById("recommendationFrequency").value,
-                recommendationCustomMonths: document.getElementById("recommendationCustomMonths").value,
-                recommendationBudget: parseFloat(document.getElementById("recommendationBudget").value) || 0,
                 scenarioShockBps: parseFloat(document.getElementById("scenarioShockBps").value) || 100,
                 simulationYears: parseInt(document.getElementById("simulationYears").value, 10) || 5,
                 simulationReinvestYield: parseFloat(document.getElementById("simulationReinvestYield").value) || 5,
@@ -3461,23 +3199,6 @@
                     if (payload.fullLadderYield !== undefined) {
                         const y = parseFloat(payload.fullLadderYield);
                         if (Number.isFinite(y) && y > 0) document.getElementById("fullLadderYield").value = y;
-                    }
-                    if (payload.recommendationCouponRate !== undefined) {
-                        const r = parseFloat(payload.recommendationCouponRate);
-                        if (Number.isFinite(r) && r > 0 && r <= 100) document.getElementById("recommendationCouponRate").value = r;
-                    }
-                    if (typeof payload.recommendationFrequency === "string") {
-                        const f = payload.recommendationFrequency;
-                        if (["monthly", "semiannual", "annual", "custom"].includes(f)) {
-                            document.getElementById("recommendationFrequency").value = f;
-                        }
-                    }
-                    if (typeof payload.recommendationCustomMonths === "string") {
-                        document.getElementById("recommendationCustomMonths").value = payload.recommendationCustomMonths;
-                    }
-                    if (payload.recommendationBudget !== undefined) {
-                        const b = parseFloat(payload.recommendationBudget);
-                        if (Number.isFinite(b) && b >= 0) document.getElementById("recommendationBudget").value = b;
                     }
                     if (payload.scenarioShockBps !== undefined) {
                         const s = parseFloat(payload.scenarioShockBps);
