@@ -41,6 +41,11 @@ ladder.html          — Complete application (HTML + CSS + JavaScript)
 README.md            — This file
 ```
 
+## Development
+
+Built with vanilla JavaScript and developed with assistance from GitHub Copilot.
+All financial logic, architecture, and validation are original work.
+
 ## Development Notes
 
 - Single-file architecture minimizes deployment friction; all logic is self-contained
